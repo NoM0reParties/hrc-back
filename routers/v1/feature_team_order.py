@@ -33,14 +33,13 @@ async def get(order_id: int, service: FeatureTeamOrderService = Depends()):
 
 @FeatureTeamOrderRouter.post(
     "/",
-    response_model=FeatureTeamOrderDTO,
     status_code=status.HTTP_201_CREATED,
 )
 async def create(
-        order: FeatureTeamOrderBaseDTO,
+        order: FeatureTeamOrderUpdateDTO,
         service: FeatureTeamOrderService = Depends(),
 ):
-    return await service.create(order)
+    await service.create(order)
 
 
 @FeatureTeamOrderRouter.put("/{order_id}")

@@ -19,6 +19,7 @@ class FeatureTeamOrderDTO(BaseModel):
 
 
 class FeatureTeamOrderUpdateDTO(BaseModel):
+    feature_id: Optional[int]
     dev_team_id: int
     updated: Optional[datetime] = datetime.now()
     hours: int

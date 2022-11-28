@@ -4,7 +4,6 @@ from fastapi import Depends
 from models import FeatureTeamOrder
 from repositories import FeatureTeamOrderRepository
 from repositories.developer_assignment import DeveloperAssignmentRepository
-from schemas import FeatureTeamOrderBaseDTO
 from schemas.developer_assignment import DeveloperAssignmentCreateDTO
 from schemas.feature_team_order import FeatureTeamOrderUpdateDTO
 
@@ -21,8 +20,14 @@ class FeatureTeamOrderService:
         self.repository = repository
         self.assignment_repository = assignment_repository
 
-    async def create(self, order: FeatureTeamOrderBaseDTO) -> None:
-        await self.repository.create(order=order)
+    async def create(self, order: FeatureTeamOrderUpdateDTO) -> None:
+        order.auto_assignment = False
+        order.assigned = True
+        if not order.feature_id:
+            raise ValueError("No feature_id")
+        order_id = await self.repository.create(order=order)
+        assignment = DeveloperAssignmentCreateDTO(developer_id=order.developer_id, feature_team_order_id=order_id)
+        await self._create_assignment(assignment=assignment)
 
     async def delete(self, order_id: int) -> None:
         return await self.repository.delete(order_id=order_id)
@@ -39,10 +44,11 @@ class FeatureTeamOrderService:
             order.assigned = True
             assignment = DeveloperAssignmentCreateDTO(developer_id=order.developer_id, feature_team_order_id=order_id)
             existing_assignment = await self.assignment_repository.find_existing_assignment(assignment=assignment)
-            print('============>>>>>>>>>>>>>>>>', existing_assignment)
             if existing_assignment:
                 await self.assignment_repository.delete(dev_assignment_id=existing_assignment.id)
             await self._create_assignment(assignment=assignment)
+        else:
+            order.assigned = False
         await self.repository.update(order_id=order_id, order=order)
 
     async def _create_assignment(self, assignment: DeveloperAssignmentCreateDTO):
