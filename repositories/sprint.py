@@ -23,7 +23,7 @@ class SprintRepository:
         limit: Optional[int] = 20,
         offset: Optional[int] = 0,
     ) -> List[Sprint]:
-        result = await self.db.execute(select(Sprint).order_by(Sprint.id.asc()).offset(offset).limit(limit))
+        result = await self.db.execute(select(Sprint).order_by(Sprint.id.desc()).offset(offset).limit(limit))
         return result.scalars().all()
 
     async def get(self, sprint_id: int) -> Sprint:

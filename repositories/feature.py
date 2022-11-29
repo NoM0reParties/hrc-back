@@ -25,8 +25,8 @@ class FeatureRepository:
 
     async def list_by_sprint(self, sprint_id: int) -> List[FeatureDTO]:
         result = await self.db.execute(
-            select(FeatureTeamOrder, Feature, Developer, DeveloperTeam, DeveloperAssignment).join(
-                Feature, FeatureTeamOrder.feature_id == Feature.id, isouter=True).join(
+            select(Feature, FeatureTeamOrder, Developer, DeveloperTeam, DeveloperAssignment).join(
+                FeatureTeamOrder, FeatureTeamOrder.feature_id == Feature.id, isouter=True).join(
                 DeveloperAssignment, FeatureTeamOrder.id == DeveloperAssignment.feature_team_order_id, isouter=True).join(
                 DeveloperTeam, FeatureTeamOrder.dev_team_id == DeveloperTeam.id, isouter=True).join(
                 Developer, DeveloperAssignment.developer_id == Developer.id, isouter=True).where(
