@@ -50,7 +50,8 @@ class SprintRepository:
         return new_sprint.fetchone()
 
     async def delete(self, sprint_id: int) -> None:
-        await self.db.execute(
-            delete(Sprint).where(Sprint.id == sprint_id)
+        sprint = (await self.db.scalars(select(Sprint).filter_by(id=sprint_id))).first()
+        await self.db.delete(
+           sprint
         )
         await self.db.commit()

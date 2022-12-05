@@ -8,7 +8,6 @@ def feature_list_mapper(
         result: List[Tuple[FeatureTeamOrder, Feature, Developer, DeveloperTeam, DeveloperAssignment]]
 ) -> List[FeatureDTO]:
     results: Dict[int, FeatureDTO] = {}
-    print(result)
     for f, fto, d, dt, da in result:
         dt_dto = DevTeamDTO(
             id=dt.id,

@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from configs.db import get_session
 from models import FeatureTeamOrder
-from schemas import FeatureTeamOrderBaseDTO
 from schemas.feature_team_order import FeatureTeamOrderUpdateDTO
 
 

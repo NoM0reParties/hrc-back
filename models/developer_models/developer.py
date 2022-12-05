@@ -12,7 +12,7 @@ class Developer(EntityMeta):
     id = Column(Integer, primary_key=True)
     first_name = Column(String(64), nullable=False, info={"verbose_name": 'Имя', })
     last_name = Column(String(64), nullable=False, info={"verbose_name": 'Фамилия', })
-    dev_team_id = Column(Integer, ForeignKey("dev_teams.id"))
+    dev_team_id = Column(Integer, ForeignKey("dev_teams.id"), nullable=False)
     dev_team = relationship("DeveloperTeam", back_populates="developers")
     involvement = Column(Integer, info={"verbose_name": 'Задействованность на проекте', })
     dev_assignments = relationship("DeveloperAssignment", back_populates="developer")

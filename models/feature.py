@@ -9,9 +9,9 @@ class Feature(EntityMeta):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(128), nullable=False, info={"verbose_name": 'Название', })
-    sprint_id = Column(Integer, ForeignKey("sprints.id"))
+    sprint_id = Column(Integer, ForeignKey("sprints.id"), nullable=False)
     sprint = relationship("Sprint", back_populates="features")
-    dev_team_orders = relationship("FeatureTeamOrder", back_populates="feature")
+    dev_team_orders = relationship("FeatureTeamOrder", back_populates="feature", cascade='all, delete')
 
     def normalize(self):
         return {

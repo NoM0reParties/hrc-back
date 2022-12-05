@@ -11,9 +11,9 @@ class DeveloperAssignment(EntityMeta):
 
     id = Column(Integer, primary_key=True)
     created = Column(DateTime, default=datetime.now())
-    feature_team_order_id = Column(Integer, ForeignKey("feature_team_orders.id"))
+    feature_team_order_id = Column(Integer, ForeignKey("feature_team_orders.id"), nullable=False)
     feature_team_order = relationship("FeatureTeamOrder", backref=backref("dev_assignment"))
-    developer_id = Column(Integer, ForeignKey("developers.id"))
+    developer_id = Column(Integer, ForeignKey("developers.id"), nullable=False)
     developer = relationship("Developer", back_populates="dev_assignments")
 
     def normalize(self):

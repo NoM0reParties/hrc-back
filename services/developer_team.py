@@ -4,6 +4,7 @@ from fastapi import Depends
 from models import DeveloperTeam
 from repositories import DeveloperTeamRepository
 from schemas import DevTeamBaseDTO
+from schemas.developer_team import DevTeamBySprintDTO
 
 
 class DeveloperTeamService:
@@ -25,6 +26,9 @@ class DeveloperTeamService:
 
     async def list(self, limit: int, offset: int) -> List[DeveloperTeam]:
         return await self.repository.list(limit=limit, offset=offset)
+
+    async def list_by_sprint(self, sprint_id: int, limit: int, offset: int) -> List[DevTeamBySprintDTO]:
+        return await self.repository.list_by_sprint(sprint_id=sprint_id, limit=limit, offset=offset)
 
     async def update(self, dev_team_id: int, dev_team: DevTeamBaseDTO) -> DeveloperTeam:
         return await self.repository.update(

@@ -26,8 +26,9 @@ class FeatureTeamOrderService:
         if not order.feature_id:
             raise ValueError("No feature_id")
         order_id = await self.repository.create(order=order)
-        assignment = DeveloperAssignmentCreateDTO(developer_id=order.developer_id, feature_team_order_id=order_id)
-        await self._create_assignment(assignment=assignment)
+        if order.developer_id:
+            assignment = DeveloperAssignmentCreateDTO(developer_id=order.developer_id, feature_team_order_id=order_id)
+            await self._create_assignment(assignment=assignment)
 
     async def delete(self, order_id: int) -> None:
         return await self.repository.delete(order_id=order_id)

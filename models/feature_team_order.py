@@ -9,9 +9,9 @@ class FeatureTeamOrder(EntityMeta):
 
     id = Column(Integer, primary_key=True)
     updated = Column(DateTime, server_default=func.now(), onupdate=func.current_timestamp())
-    dev_team_id = Column(Integer, ForeignKey("dev_teams.id"))
+    dev_team_id = Column(Integer, ForeignKey("dev_teams.id"), nullable=False)
     dev_team = relationship("DeveloperTeam", back_populates="dev_team_orders")
-    feature_id = Column(Integer, ForeignKey("features.id"))
+    feature_id = Column(Integer, ForeignKey("features.id"), nullable=False)
     feature = relationship("Feature", back_populates="dev_team_orders")
     assigned = Column(Boolean)
     hours = Column(Integer)

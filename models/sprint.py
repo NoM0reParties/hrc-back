@@ -13,7 +13,7 @@ class Sprint(EntityMeta):
     ending_date = Column(Date, info={"verbose_name": 'Дата окончания', })
     # owner USERID
     gap = Column(Integer, info={"verbose_name": 'Буффер в процентах', })
-    features = relationship("Feature", back_populates="sprint")
+    features = relationship("Feature", back_populates="sprint", cascade='all, delete')
 
     def normalize(self):
         return {
