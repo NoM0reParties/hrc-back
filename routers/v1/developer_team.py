@@ -3,7 +3,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, status
 
 from schemas import DevTeamBaseDTO, DevTeamDTO
-from schemas.developer_team import DevTeamBySprintDTO
+from schemas.developer_team import DevTeamBySprintDTO, DevTeamWithDevelopersDTO
 from services import DeveloperTeamService
 
 DevTeamRouter = APIRouter(
@@ -11,19 +11,13 @@ DevTeamRouter = APIRouter(
 )
 
 
-@DevTeamRouter.get("/", response_model=List[DevTeamDTO])
+@DevTeamRouter.get("/", response_model=List[DevTeamWithDevelopersDTO])
 async def index(
         limit: Optional[int] = 20,
         offset: Optional[int] = 0,
         service: DeveloperTeamService = Depends(),
 ):
-    return [
-        dt.normalize()
-        for dt in await service.list(
-            limit=limit,
-            offset=offset,
-        )
-    ]
+    return await service.list(limit=limit, offset=offset)
 
 
 @DevTeamRouter.get("/sprint/{sprint_id}", response_model=List[DevTeamBySprintDTO])
@@ -33,7 +27,6 @@ async def index(
         offset: Optional[int] = 0,
         service: DeveloperTeamService = Depends(),
 ):
-    print(await service.list_by_sprint(sprint_id=sprint_id, limit=limit, offset=offset))
     return await service.list_by_sprint(sprint_id=sprint_id, limit=limit, offset=offset)
 
 
@@ -44,7 +37,6 @@ async def get(dev_team_id: int, service: DeveloperTeamService = Depends()):
 
 @DevTeamRouter.post(
     "/",
-    response_model=DevTeamDTO,
     status_code=status.HTTP_201_CREATED,
 )
 async def create(
@@ -54,13 +46,13 @@ async def create(
     return await service.create(dev_team=dev_team)
 
 
-@DevTeamRouter.patch("/{dev_team_id}", response_model=DevTeamDTO)
+@DevTeamRouter.put("/{dev_team_id}")
 async def update(
         dev_team_id: int,
         dev_team: DevTeamBaseDTO,
         service: DeveloperTeamService = Depends(),
 ):
-    return (await service.update(dev_team_id=dev_team_id, dev_team=dev_team)).normalize()
+    return await service.update(dev_team_id=dev_team_id, dev_team=dev_team)
 
 
 @DevTeamRouter.delete(

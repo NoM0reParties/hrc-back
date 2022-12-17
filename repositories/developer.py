@@ -34,26 +34,21 @@ class DeveloperRepository:
         result = await self.db.execute(select(Developer).where(Developer.id == developer_id))
         return result.scalar()
 
-    async def create(self, developer: DeveloperCreateDTO) -> Developer:
+    async def create(self, developer: DeveloperCreateDTO) -> None:
         values: dict = developer.dict()
-        new_dev: Developer = await self.db.execute(
-            insert(Developer).values(**values).execution_options(synchronize_session="fetch").returning(
-                Developer.id, Developer.first_name, Developer.last_name, Developer.involvement
-            ),
+        print(values)
+        await self.db.execute(
+            insert(Developer).values(**values).execution_options(synchronize_session="fetch")
         )
         await self.db.commit()
-        return new_dev.fetchone()
 
-    async def update(self, developer_id: int, developer: DeveloperCreateDTO) -> Developer:
+    async def update(self, developer_id: int, developer: DeveloperCreateDTO) -> None:
         values: dict = developer.dict()
-        new_dev: Developer = await self.db.execute(
+        await self.db.execute(
             update(Developer).where(Developer.id == developer_id).values(
-                **values).execution_options(synchronize_session="fetch").returning(
-                Developer.id, Developer.first_name, Developer.last_name, Developer.involvement
-            ),
+                **values)
         )
         await self.db.commit()
-        return new_dev.fetchone()
 
     async def delete(self, developer_id: int) -> None:
         await self.db.execute(

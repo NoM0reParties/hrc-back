@@ -34,23 +34,22 @@ async def get(developer_id: int, service: DeveloperService = Depends()):
 
 @DeveloperRouter.post(
     "/",
-    response_model=DeveloperDTO,
     status_code=status.HTTP_201_CREATED,
 )
 async def create(
         developer: DeveloperCreateDTO,
         service: DeveloperService = Depends(),
 ):
-    return await service.create(developer)
+    await service.create(developer)
 
 
-@DeveloperRouter.put("/{developer_id}", response_model=DeveloperDTO)
+@DeveloperRouter.put("/{developer_id}")
 async def update(
         developer_id: int,
         developer: DeveloperCreateDTO,
         service: DeveloperService = Depends(),
 ):
-    return (await service.update(developer_id, developer)).normalize()
+    await service.update(developer_id, developer)
 
 
 @DeveloperRouter.delete(

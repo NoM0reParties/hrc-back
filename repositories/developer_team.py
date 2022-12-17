@@ -7,12 +7,12 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from configs.db import get_session
-from mappers.developer_team_router import dev_team_list_mapper
+from mappers.developer_team_router import dev_team_list_mapper, team_list_mapper
 from models import DeveloperTeam, Feature, FeatureTeamOrder, Sprint
 from models.developer_models.developer import Developer
 from models.developer_models.developer_assignment import DeveloperAssignment
 from schemas import DevTeamBaseDTO
-from schemas.developer_team import DevTeamBySprintDTO
+from schemas.developer_team import DevTeamBySprintDTO, DevTeamWithDevelopersDTO
 
 
 class DeveloperTeamRepository:
@@ -27,10 +27,21 @@ class DeveloperTeamRepository:
             self,
             limit: Optional[int] = 20,
             offset: Optional[int] = 0,
-    ) -> List[DeveloperTeam]:
-        result = await self.db.execute(select(DeveloperTeam).order_by(
-            DeveloperTeam.id.desc()).offset(offset).limit(limit))
-        return result.scalars().all()
+    ) -> List[DevTeamWithDevelopersDTO]:
+        result = await self.db.execute(select(
+            Developer.id,
+            Developer.first_name,
+            Developer.last_name,
+            Developer.involvement,
+            Developer.dev_team_id,
+            DeveloperTeam.id,
+            DeveloperTeam.name,
+        ).join(
+            Developer, Developer.dev_team_id == DeveloperTeam.id, isouter=True
+        ).order_by(
+            DeveloperTeam.id.asc()
+        ).offset(offset).limit(limit))
+        return team_list_mapper(result.all())
 
     async def list_by_sprint(
             self,
@@ -104,26 +115,15 @@ class DeveloperTeamRepository:
         result = await self.db.execute(select(DeveloperTeam).where(DeveloperTeam.id == dev_team_id))
         return result.scalar()
 
-    async def create(self, dev_team: DevTeamBaseDTO) -> DeveloperTeam:
+    async def create(self, dev_team: DevTeamBaseDTO):
         values: dict = dev_team.dict()
-        new_dev: DeveloperTeam = await self.db.execute(
-            insert(DeveloperTeam).values(**values).execution_options(synchronize_session="fetch").returning(
-                DeveloperTeam.id, DeveloperTeam.first_name, DeveloperTeam.last_name, DeveloperTeam.involvement
-            ),
-        )
+        await self.db.execute(insert(DeveloperTeam).values(**values))
         await self.db.commit()
-        return new_dev.fetchone()
 
-    async def update(self, dev_team_id: int, dev_team: DevTeamBaseDTO) -> DeveloperTeam:
+    async def update(self, dev_team_id: int, dev_team: DevTeamBaseDTO):
         values: dict = dev_team.dict()
-        new_dev: DeveloperTeam = await self.db.execute(
-            update(DeveloperTeam).where(DeveloperTeam.id == dev_team_id).values(
-                **values).execution_options(synchronize_session="fetch").returning(
-                DeveloperTeam.id, DeveloperTeam.first_name, DeveloperTeam.last_name, DeveloperTeam.involvement
-            ),
-        )
+        await self.db.execute(update(DeveloperTeam).where(DeveloperTeam.id == dev_team_id).values(**values))
         await self.db.commit()
-        return new_dev.fetchone()
 
     async def delete(self, dev_team_id: int) -> None:
         await self.db.execute(
